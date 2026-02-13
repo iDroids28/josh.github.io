@@ -98,6 +98,45 @@
             color: #ffd9e2;
         }
 
+        /* music control – romantic button */
+        .music-control {
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #ffdee6;
+            box-shadow: 0 0 15px rgba(255, 80, 120, 0.3);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .music-control:hover {
+            background: rgba(255, 120, 160, 0.3);
+            transform: scale(1.02);
+            border-color: #ffb0c0;
+        }
+
+        .music-control span {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .music-control .song-name {
+            font-style: italic;
+            opacity: 0.9;
+        }
+
         @media (max-width: 600px) {
             .valentine-card {
                 padding: 2rem 2rem;
@@ -111,6 +150,10 @@
             }
             .big-heart {
                 font-size: 5rem;
+            }
+            .music-control {
+                font-size: 1rem;
+                padding: 0.3rem 1rem;
             }
         }
     </style>
@@ -127,16 +170,28 @@
         <div class="big-heart">❤️</div>
         <p>ILOVEYOU ALWAYS MY LOVEEE</p>
         <div class="tiny-note">FROM YOUR CRUSH, Josh ♥</div>
+        
+        <!-- Music control for "To the Bone" by Pamungkas -->
+        <div class="music-control" id="musicToggle">
+            <span>🎵</span>
+            <span class="song-name">To the Bone (Pamungkas)</span>
+            <span id="playPauseIcon">▶️</span>
+        </div>
     </div>
+
+    <!-- Hidden audio element – make sure to upload "to_the_bone.mp3" to the same folder -->
+    <audio id="bgSong" loop preload="auto">
+        <source src="to_the_bone.mp3" type="audio/mpeg">
+        Your browser does not support the audio element. Please download the song "To the Bone" by Pamungkas.
+    </audio>
 
     <script>
         (function() {
+            // ---------- canvas heart animation (unchanged) ----------
             const canvas = document.getElementById('heartCanvas');
             const ctx = canvas.getContext('2d');
-
             let width, height;
             let particles = [];
-
             const HEART_SYMBOL = '♥';
             const PARTICLE_COUNT = 150;
 
@@ -230,6 +285,50 @@
 
             resizeCanvas();
             animate();
+
+            // ---------- music control for "To the Bone" by Pamungkas ----------
+            const audio = document.getElementById('bgSong');
+            const toggleBtn = document.getElementById('musicToggle');
+            const playPauseIcon = document.getElementById('playPauseIcon');
+
+            // Initial icon
+            playPauseIcon.textContent = '▶️';
+
+            // Show error if song file fails to load
+            audio.addEventListener('error', () => {
+                playPauseIcon.textContent = '❌';
+                toggleBtn.style.opacity = '0.6';
+                toggleBtn.title = 'Song file not found (to_the_bone.mp3)';
+            });
+
+            // Toggle play/pause on click
+            toggleBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play()
+                        .then(() => {
+                            playPauseIcon.textContent = '⏸️';
+                        })
+                        .catch(err => {
+                            alert('Click "Play" to start the song (browser needs interaction).');
+                            console.warn('Audio play failed:', err);
+                        });
+                } else {
+                    audio.pause();
+                    playPauseIcon.textContent = '▶️';
+                }
+            });
+
+            // Update icon when audio ends
+            audio.addEventListener('ended', () => {
+                playPauseIcon.textContent = '▶️';
+            });
+
+            audio.addEventListener('playing', () => {
+                playPauseIcon.textContent = '⏸️';
+            });
+            audio.addEventListener('pause', () => {
+                playPauseIcon.textContent = '▶️';
+            });
         })();
     </script>
 </body>
